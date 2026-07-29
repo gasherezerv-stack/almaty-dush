@@ -1,0 +1,13 @@
+{
+  "name": "Almaty Dush — Расчёт душевой кабины",
+  "short_name": "Almaty Dush",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#14261E",
+  "theme_color": "#14261E",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
