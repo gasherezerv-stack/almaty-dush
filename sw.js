@@ -1,5 +1,5 @@
 // Bump this version string on every deploy to force clients to pick up new files.
-const CACHE = 'almaty-dush-v6';
+const CACHE = 'almaty-dush-v7';
 const ASSETS = [
   './',
   './index.html',
