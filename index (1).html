@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14261E">
+<title>Almaty Dush — Расчёт душевой кабины</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icons-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Almaty Dush">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="fonts.js"></script>
+<style>
+  :root{
+    --bg:#14261E;
+    --card:#1C3128;
+    --input-bg:#20362B;
+    --border:#33493D;
+    --cream:#ECE6D8;
+    --muted:#8FA69A;
+    --gold:#D8AD76;
+    --gold-dark:#C89A5F;
+    --maroon-bg:#47201F;
+    --maroon-text:#E2827A;
+    --divider:#33493D;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--cream);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    min-height:100vh;
+    padding:28px 20px 60px;
+  }
+  .wrap{max-width:520px;margin:0 auto;}
+  .eyebrow{
+    letter-spacing:6px;
+    font-size:12px;
+    font-weight:700;
+    color:var(--muted);
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:Georgia,'Times New Roman',serif;
+    font-size:40px;
+    line-height:1.08;
+    margin:0 0 22px;
+    color:var(--cream);
+    font-weight:700;
+  }
+  .alert{
+    background:var(--maroon-bg);
+    color:var(--maroon-text);
+    font-weight:700;
+    font-size:15px;
+    padding:16px 18px;
+    border-radius:14px;
+    margin-bottom:28px;
+  }
+  .section-label{
+    letter-spacing:3px;
+    font-size:13px;
+    font-weight:700;
+    color:var(--cream);
+    margin:26px 0 14px;
+    text-transform:uppercase;
+  }
+  .row{display:flex; gap:16px;}
+  .field{flex:1; margin-bottom:4px;}
+  .field label{
+    display:block;
+    font-size:14px;
+    font-weight:700;
+    color:var(--cream);
+    margin-bottom:8px;
+  }
+  input, select{
+    width:100%;
+    background:var(--input-bg);
+    border:1.5px solid var(--border);
+    color:var(--cream);
+    font-size:20px;
+    font-weight:700;
+    padding:16px 18px;
+    border-radius:14px;
+    outline:none;
+    font-family:inherit;
+    appearance:none;
+    -webkit-appearance:none;
+  }
+  input::placeholder{color:#5C7367;}
+  input:focus, select:focus{border-color:var(--gold);}
+  select{
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'><path d='M1 1l6 6 6-6' stroke='%238FA69A' stroke-width='2' fill='none' stroke-linecap='round'/></svg>");
+    background-repeat:no-repeat;
+    background-position:right 16px center;
+    padding-right:40px;
+  }
+  .summary{
+    margin-top:30px;
+    border:1.5px solid var(--border);
+    border-radius:18px;
+    padding:24px 22px;
+  }
+  .summary-title{
+    letter-spacing:3px;
+    font-size:13px;
+    font-weight:700;
+    color:var(--muted);
+    margin-bottom:18px;
+    text-transform:uppercase;
+  }
+  .summary-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 0;
+    font-size:17px;
+  }
+  .summary-row .val{color:var(--cream); font-weight:600;}
+  .summary-row .val.dim{color:var(--muted); font-weight:400;}
+  .divider{height:1px; background:var(--divider); margin:8px 0;}
+  .summary-row.total{font-size:22px; font-weight:800;}
+  .summary-row.total .label{font-family:Georgia,serif;}
+  .summary-row.total .val{color:var(--gold);}
+  button.cta{
+    width:100%;
+    margin-top:28px;
+    background:var(--gold);
+    color:#1A1208;
+    border:none;
+    padding:20px;
+    font-size:17px;
+    font-weight:800;
+    letter-spacing:1px;
+    border-radius:16px;
+    cursor:pointer;
+  }
+  button.cta:active{background:var(--gold-dark);}
+  button.cta:disabled{opacity:.5; cursor:not-allowed;}
+  .hint{
+    font-size:12px;
+    color:var(--muted);
+    text-align:center;
+    margin-top:12px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">ALMATY DUSH</div>
+  <h1>Расчёт душевой<br>кабины</h1>
+
+  <div class="alert" id="alertBox">Заполните размеры стекла и цену.</div>
+
+  <div class="section-label">1. Первое стекло (мм)</div>
+  <div class="row">
+    <div class="field">
+      <label>Ширина</label>
+      <input type="number" inputmode="numeric" id="w1" placeholder="900">
+    </div>
+    <div class="field">
+      <label>Высота</label>
+      <input type="number" inputmode="numeric" id="h1" placeholder="2000">
+    </div>
+  </div>
+
+  <div class="section-label">2. Второе стекло (мм), если есть</div>
+  <div class="row">
+    <div class="field">
+      <label>Ширина</label>
+      <input type="number" inputmode="numeric" id="w2" placeholder="500">
+    </div>
+    <div class="field">
+      <label>Высота</label>
+      <input type="number" inputmode="numeric" id="h2" placeholder="2000">
+    </div>
+  </div>
+
+  <div class="section-label">3. Цена стекла, ₸/м²</div>
+  <input type="number" inputmode="numeric" id="pricePerM2" placeholder="12000">
+
+  <div class="row" style="margin-top:26px;">
+    <div class="field">
+      <div class="section-label" style="margin-top:0;">4. Цвет стекла</div>
+      <select id="glassColor">
+        <option>Прозрачное</option>
+        <option>Матовое</option>
+        <option>Бронза</option>
+        <option>Графит</option>
+        <option>Рифленое</option>
+        <option>Ультра кристалл</option>
+      </select>
+    </div>
+    <div class="field">
+      <div class="section-label" style="margin-top:0;">5. Цвет фурнитуры</div>
+      <select id="hardwareColor">
+        <option>Хром</option>
+        <option>Черный</option>
+        <option>Сатин</option>
+        <option>Золото</option>
+        <option>Золото мат</option>
+        <option>Графит</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="section-label">6. Фурнитура, ₸</div>
+  <input type="number" inputmode="numeric" id="hardwareCost" placeholder="45000">
+
+  <div class="section-label">7. Работа, ₸</div>
+  <input type="number" inputmode="numeric" id="workCost" placeholder="15000">
+
+  <div class="summary">
+    <div class="summary-title">Итог</div>
+    <div class="summary-row"><span>Стекло</span><span class="val dim" id="sumGlass">—</span></div>
+    <div class="summary-row"><span>Фурнитура</span><span class="val dim" id="sumHardware">—</span></div>
+    <div class="summary-row"><span>Работа</span><span class="val dim" id="sumWork">—</span></div>
+    <div class="divider"></div>
+    <div class="summary-row total"><span class="label">Итого</span><span class="val" id="sumTotal">—</span></div>
+  </div>
+
+  <button class="cta" id="createBtn">СОЗДАТЬ КП</button>
+  <div class="hint">Откроется меню «Поделиться» — выберите WhatsApp</div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const ids = ['w1','h1','w2','h2','pricePerM2','hardwareCost','workCost'];
+const fmt = n => Math.round(n).toLocaleString('ru-RU').replace(/,/g,' ') + ' ₸';
+
+function calc(){
+  const w1 = parseFloat($('w1').value)||0, h1 = parseFloat($('h1').value)||0;
+  const w2 = parseFloat($('w2').value)||0, h2 = parseFloat($('h2').value)||0;
+  const price = parseFloat($('pricePerM2').value)||0;
+  const hardware = parseFloat($('hardwareCost').value)||0;
+  const work = parseFloat($('workCost').value)||0;
+
+  const area1 = (w1*h1)/1e6;
+  const area2 = (w2*h2)/1e6;
+  const totalArea = area1+area2;
+  const glassCost = totalArea*price;
+  const total = glassCost + hardware + work;
+
+  // Второе стекло необязательное: оба поля пустые = перегородка из одного стекла
+  const hasGlass2 = w2>0 && h2>0;
+  const glass2Partial = (w2>0) !== (h2>0);
+  const ready = w1>0 && h1>0 && price>0 && !glass2Partial;
+  $('alertBox').textContent = glass2Partial
+    ? 'Заполните ширину и высоту второго стекла или оставьте оба поля пустыми.'
+    : 'Заполните размеры стекла и цену.';
+
+  if(ready){
+    $('sumGlass').textContent = fmt(glassCost);
+    $('sumGlass').classList.remove('dim');
+    $('sumHardware').textContent = fmt(hardware);
+    $('sumHardware').classList.remove('dim');
+    $('sumWork').textContent = fmt(work);
+    $('sumWork').classList.remove('dim');
+    $('sumTotal').textContent = fmt(total);
+    $('alertBox').style.display = 'none';
+  } else {
+    $('sumGlass').textContent = '—';
+    $('sumHardware').textContent = '—';
+    $('sumWork').textContent = '—';
+    $('sumTotal').textContent = '—';
+    $('alertBox').style.display = 'block';
+  }
+  $('createBtn').disabled = !ready;
+  return {w1,h1,w2,h2,hasGlass2,price,hardware,work,glassCost,total,ready};
+}
+
+ids.forEach(id => $(id).addEventListener('input', calc));
+calc();
+
+function todayStr(){
+  const d = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  return `${pad(d.getDate())}.${pad(d.getMonth()+1)}.${d.getFullYear()}, ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+$('createBtn').addEventListener('click', () => {
+  const c = calc();
+  if(!c.ready) return;
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:'pt', format:'a4' });
+
+  // Register Cyrillic-capable fonts (subsetted DejaVu) so Russian text renders correctly
+  doc.addFileToVFS('DejaVuSans.ttf', PDF_FONTS.DejaVuSans);
+  doc.addFont('DejaVuSans.ttf', 'DejaVuSans', 'normal');
+  doc.addFileToVFS('DejaVuSans-Bold.ttf', PDF_FONTS.DejaVuSansBold);
+  doc.addFont('DejaVuSans-Bold.ttf', 'DejaVuSans', 'bold');
+  doc.addFileToVFS('DejaVuSerif-Bold.ttf', PDF_FONTS.DejaVuSerifBold);
+  doc.addFont('DejaVuSerif-Bold.ttf', 'DejaVuSerifBold', 'bold');
+
+  const FONT_SANS = 'DejaVuSans';
+  const FONT_SERIF_BOLD = 'DejaVuSerifBold';
+
+  const bg = [20,38,30];
+  const cream = [236,230,216];
+  const muted = [143,166,154];
+  const gold = [216,173,118];
+  const cardBorder = [51,73,61];
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+
+  doc.setFillColor(...bg);
+  doc.rect(0,0,pageW,pageH,'F');
+
+  const marginX = 50;
+  const tableX = marginX;
+  const tableW = pageW - marginX*2;
+  const footerY = pageH-70;
+  const footerLineY = footerY - 20;
+
+  let y = 70;
+  doc.setTextColor(...muted);
+  doc.setFont(FONT_SANS,'bold');
+  doc.setFontSize(11);
+  doc.text('A L M A T Y   D U S H', marginX, y);
+
+  y += 34;
+  doc.setTextColor(...cream);
+  doc.setFont(FONT_SERIF_BOLD,'bold');
+  doc.setFontSize(26);
+  doc.text('Коммерческое предложение', marginX, y);
+
+  const headerBottom = y;
+
+  const rows = [
+    ...(c.hasGlass2
+      ? [['Стекло №1', `${c.w1} × ${c.h1} мм`], ['Стекло №2', `${c.w2} × ${c.h2} мм`]]
+      : [['Стекло', `${c.w1} × ${c.h1} мм`]]),
+    ['Цвет стекла', $('glassColor').value],
+    ['Цвет фурнитуры', $('hardwareColor').value],
+  ];
+
+  // Spread the leftover vertical space across the gaps between blocks so the
+  // page stays balanced regardless of how many table rows there are.
+  const rowH = 46;
+  const cardH = 160;
+  const noteH = 30;
+  const tableHeight = rows.length*rowH;
+  const minGapA = 46, minGapB = 46, minGapC = 40;
+  const fixedContent = tableHeight + cardH + noteH;
+  const available = footerLineY - headerBottom - minGapA - minGapB - minGapC;
+  const extra = Math.max(0, available - fixedContent);
+  const gapA = minGapA + extra*0.18;
+  const gapB = minGapB + extra*0.52;
+  const gapC = minGapC + extra*0.30;
+
+  y = headerBottom + gapA;
+  const tableStartY = y;
+
+  doc.setDrawColor(...cardBorder);
+  doc.setLineWidth(0.75);
+  doc.setFontSize(13);
+  rows.forEach((r,i) => {
+    const ry = tableStartY + i*rowH;
+    doc.line(tableX, ry+rowH, tableX+tableW, ry+rowH);
+    doc.setFont(FONT_SANS,'normal');
+    doc.setTextColor(...muted);
+    doc.text(r[0], tableX, ry+rowH-14);
+    doc.setFont(FONT_SANS,'bold');
+    doc.setTextColor(...cream);
+    doc.text(String(r[1]), tableX+tableW, ry+rowH-14, {align:'right'});
+  });
+
+  y = tableStartY + tableHeight + gapB;
+  const cardY = y;
+
+  doc.setDrawColor(...cardBorder);
+  doc.roundedRect(tableX, cardY, tableW, cardH, 16, 16);
+  doc.setFont(FONT_SANS,'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(...muted);
+  doc.text('О Б Щ А Я   С Т О И М О С Т Ь', tableX+tableW/2, cardY+46, {align:'center'});
+  doc.setFont(FONT_SERIF_BOLD,'bold');
+  doc.setFontSize(42);
+  doc.setTextColor(...gold);
+  doc.text(fmt(c.total), tableX+tableW/2, cardY+104, {align:'center'});
+
+  y = cardY + cardH + gapC;
+  doc.setFont(FONT_SANS,'normal');
+  doc.setFontSize(11);
+  doc.setTextColor(...cream);
+  doc.text('✓ Замер и монтаж входят в стоимость.', tableX, y);
+
+  doc.setDrawColor(...cardBorder);
+  doc.line(tableX, footerLineY, tableX+tableW, footerLineY);
+  doc.setFont(FONT_SANS,'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(...muted);
+  doc.text('ALMATY DUSH', tableX, footerY);
+  doc.text('WhatsApp: +7 777 666 6603', tableX, footerY+14);
+  doc.text('Instagram: @almaty_dush', tableX, footerY+28);
+  doc.text(todayStr(), tableX+tableW, footerY, {align:'right'});
+  doc.text('Стр. 1 из 1', tableX+tableW, footerY+14, {align:'right'});
+
+  const filename = `KP_AlmatyDush_${Date.now()}.pdf`;
+  const blob = doc.output('blob');
+
+  const shareOrDownload = async () => {
+    try {
+      const file = new File([blob], filename, { type: 'application/pdf' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: 'Коммерческое предложение — Almaty Dush',
+          text: 'Коммерческое предложение Almaty Dush'
+        });
+        return;
+      }
+    } catch (err) {
+      if (err && err.name === 'AbortError') return; // user closed the share sheet, don't also force a download
+    }
+    // Fallback for browsers without Web Share (files) support: plain download
+    doc.save(filename);
+  };
+
+  shareOrDownload();
+});
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
