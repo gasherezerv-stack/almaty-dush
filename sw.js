@@ -1,5 +1,5 @@
 // Bump this version string on every deploy to force clients to pick up new files.
-const CACHE = 'almaty-dush-v7';
+const CACHE = 'almaty-dush-v8';
 const ASSETS = [
   './',
   './index.html',
@@ -7,7 +7,7 @@ const ASSETS = [
   './fonts.js',
   './icons/icons-192.png',
   './icon/icons-512.png',
-  'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
+  './lib/jspdf.umd.min.js'
 ];
 
 self.addEventListener('install', e => {

@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Almaty Dush">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="lib/jspdf.umd.min.js"></script>
 <script src="fonts.js"></script>
 <style>
   :root{
@@ -147,6 +147,12 @@
     text-align:center;
     margin-top:12px;
   }
+  .hint.legal{
+    font-size:11px;
+    opacity:.7;
+    margin-top:22px;
+    line-height:1.4;
+  }
 </style>
 </head>
 <body>
@@ -225,6 +231,7 @@
 
   <button class="cta" id="createBtn">СОЗДАТЬ КП</button>
   <div class="hint">Откроется меню «Поделиться» — выберите WhatsApp</div>
+  <div class="hint legal">© Almaty Dush. Программа защищена авторским правом. Копирование, передача третьим лицам и перепродажа без письменного разрешения запрещены.</div>
 </div>
 
 <script>
@@ -400,6 +407,7 @@ $('createBtn').addEventListener('click', () => {
   doc.text('Instagram: @almaty_dush', tableX, footerY+28);
   doc.text(todayStr(), tableX+tableW, footerY, {align:'right'});
   doc.text('Стр. 1 из 1', tableX+tableW, footerY+14, {align:'right'});
+  doc.text('Создано в Almaty Dush', tableX+tableW, footerY+28, {align:'right'});
 
   const filename = `KP_AlmatyDush_${Date.now()}.pdf`;
   const blob = doc.output('blob');
